@@ -1,0 +1,3257 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>end-to-end dysarthric speech reconstruction</title>
+<style>
+body {
+  font-size: 20px;
+}
+audio {
+  width: 200px;
+  margin-right: 10px;
+}
+
+</style>
+</head>
+-->
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Demo for multi-speaker Lip-to-Speech</title>
+
+<style>
+body {
+  font-size: 20px;
+}
+audio {
+  width: 200px;
+  margin-right: 10px;
+}
+</style>
+
+
+<!-- Meta tags for search engines to crawl -->
+<meta name="robots" content="index,follow">
+<meta name="description" content="Here shows my abstract">
+<meta name="keywords" content="Multi-speaker; Lip-to-Speech synthesis; voice conversion; knowledge transfer; vector quantization; contrastive predictive coding; speech generation;">
+<link rel="author" href="https://wendison.github.io/KTVC-MSLTS-demo/">
+
+<!-- Fonts and stuff -->
+<link href="./LTS/css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="./LTS/project.css" media="screen">
+<link rel="stylesheet" type="text/css" media="screen" href="./LTS/iconize.css">
+<script async="" src="./LTS/prettify.js"></script>
+
+</head>
+
+<body>
+    <div id="content">
+    <div id="content-inner">
+      <div class="section head">
+
+      <h1>Multi-speaker Lip-to-Speech synthesis</h1>
+
+      <div class="authors">
+        <a href="https://wendison.github.io/">Disong Wang<sup>1</sup></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="https://scholar.google.com/citations?user=J-xVJToAAAAJ&hl=en/">Shan Yang<sup>2</sup></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="https://scholar.google.com/citations?user=yE6WZy4AAAAJ&hl=zh-CN/">Dan Su<sup>2</sup></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        </br>
+        <a href="https://www1.se.cuhk.edu.hk/~xyliu/">Xunying Liu<sup>1</sup></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="https://scholar.google.com/citations?user=tMY31_gAAAAJ&hl=zh-TW/">Dong Yu<sup>2</sup></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="https://www.se.cuhk.edu.hk/people/academic-staff/prof-meng-mei-ling-helen/">Helen Meng<sup>1</sup></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+
+      <div class="affiliations">
+          <p> <sup>1</sup>The Chinese University of Hong Kong, <sup>2</sup>Tencent AI lab </p>
+      </div>
+
+
+      <!--<div class="venue">(<a href="https://2022.ieeeicassp.org/" target="_blank">ICASSP 2022</a>) 2020, <font color="#e86e14">Unknown</font> </div>-->
+    </div>
+
+      <!--<center><img src="./LTS/diagram.png" border="0" width="90%"></center>-->
+
+
+
+    <div class="section abstract">
+      <h2>Content</h2>
+      <br>
+      <p>
+        <ul>
+            <li><strong><a href="#abstract"><font size="4">Abstract</font></a></strong>
+            <li><strong><a href="#comparison"><font size="4">LTS on GRID</font></a></strong>
+                <ul>
+                    <li>
+                        <strong><a href="#comparison"><font size="4">Seen speaker</font></a></strong>
+                    </li>
+                    <li>
+                        <strong><a href="#comparison"><font size="4">Uneen speaker</font></a></strong>
+                    </li>
+                </ul>
+            </li>
+            <li><strong><a href="#ablation"><font size="4">LTS on LRW</font></a></strong></li>
+            <li><strong><a href="#ablation"><font size="4">Speaker identity control</font></a></strong></li>
+        </ul>
+      </p>
+    </div>
+
+    <hr style="height:3px;border:none;border-top:5px solid #555555;" />
+    <div class="section abstract">
+      <a name="abstract">
+      <h2>Abstract</h2>
+      </a>
+      <br>
+      <p>
+        Here shows the abstract - TODO.
+      </p>
+    </div>
+
+
+    <!--<h2>Audio samples: Dysarthric speech reconstruction</h2>
+    <p><strong>Authors: </strong> Disong Wang, Songxiang Liu, Xinxi Wu, Hui Lu, Lifa Sun, Xunying Liu and Helen Meng</p>-->
+
+    <!--<strong><p class="toc_title", style="font-size:20px">Contents</p></strong>
+      <div id="toc_container">
+         <ul>
+            <li><strong><a href="#comparison"><font size="5">1. Reconstruction performance of different methods</font></a></li></strong>
+            <li><strong><a href="#ablation"><font size="5">2. Impact of phoneme duration and F0</font></a></li></strong>
+         </ul>
+      </div>-->
+
+  <hr style="height:3px;border:none;border-top:5px solid #555555;" />
+    <a name="comparison">
+    <h2>1. Reconstruction performance of different systems</h2>
+    </a>
+    <li>Systems comparison:</li>
+    <ul>
+        <li><strong>Original:</strong> Original dysarthric speech.</li>
+        <li><strong>E2E-VC:</strong> End-to-end VC [ref] using a speaker encoder trained on the speaker verification (SV) task to control speaker identity.</li>
+        <li><strong>SV-VC:</strong> Proposed method using explicit prosody correction and speaker encoder trained on the speaker verification (SV) task to control speaker identity.</li>
+        <li><strong>SA-VC:</strong> A system based on SV-VC, where speaker encoder is fine-tuned via speaker adaptation (SA).</li>
+        <li><strong>ASA-VC:</strong> A system based on SV-VC, where speaker encoder is fine-tuned via proposed adversarial speaker adaptation (ASA).</li>
+    </ul>
+
+    <h3>M05 (dysarthria-moderate):</h3>
+    <table border="1">
+    <tr>
+    <th>No.</th>
+    <th>Silent video</th>
+    <th>XTS</th>
+    <th>Lip2Wav</th>
+    <th>Proposed (GL)</th>
+    <th>Proposed (PWG)</th>
+    <th>Ground-truth</th>
+    <th>Text</th>
+    </tr>
+
+    <tr>
+    <td>1</td>
+    <td>
+    <video controls>
+    <source src="./videos/grid-seen/s1_bbwm4n_sil.avi" type="video/avi">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW16_M4_ABLUTIONS_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW16_M4_ABLUTIONS_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW16_M4_ABLUTIONS_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW16_M4_ABLUTIONS_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">ablutions</td>
+    </tr>
+
+    <tr>
+    <td>2</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW35_M3_ATROCIOUS_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW35_M3_ATROCIOUS_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW35_M3_ATROCIOUS_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW35_M3_ATROCIOUS_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW35_M3_ATROCIOUS_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">atrocious</td>
+    </tr>
+
+    <tr>
+    <td>3</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW85_M6_WATCHES_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW85_M6_WATCHES_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW85_M6_WATCHES_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW85_M6_WATCHES_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW85_M6_WATCHES_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">watches</td>
+    </tr>
+
+    <tr>
+    <td>4</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW89_M4_RABBIT_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW89_M4_RABBIT_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW89_M4_RABBIT_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW89_M4_RABBIT_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW89_M4_RABBIT_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">rabbit</td>
+    </tr>
+
+    <tr>
+    <td>5</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW93_M6_CHAIR_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW93_M6_CHAIR_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW93_M6_CHAIR_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW93_M6_CHAIR_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW93_M6_CHAIR_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">chair</td>
+    </tr>
+
+    <tr>
+    <td>6</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW94_M2_FEATHER_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW94_M2_FEATHER_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW94_M2_FEATHER_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW94_M2_FEATHER_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW94_M2_FEATHER_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">feather</td>
+    </tr>
+
+    <tr>
+    <td>7</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C2_M5_BACKSPACE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C2_M5_BACKSPACE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C2_M5_BACKSPACE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C2_M5_BACKSPACE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C2_M5_BACKSPACE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">backspace</td>
+    </tr>
+
+    <tr>
+    <td>8</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C6_M6_ESCAPE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C6_M6_ESCAPE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C6_M6_ESCAPE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C6_M6_ESCAPE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C6_M6_ESCAPE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">escape</td>
+    </tr>
+
+    <tr>
+    <td>9</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C11_M7_PARAGRAPH_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C11_M7_PARAGRAPH_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C11_M7_PARAGRAPH_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C11_M7_PARAGRAPH_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C11_M7_PARAGRAPH_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">paragraph</td>
+    </tr>
+
+    <tr>
+    <td>10</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C12_M5_SENTENCE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C12_M5_SENTENCE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C12_M5_SENTENCE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C12_M5_SENTENCE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C12_M5_SENTENCE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">sentence</td>
+    </tr>
+
+    <tr>
+    <td>11</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C16_M3_UPWARD_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C16_M3_UPWARD_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C16_M3_UPWARD_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C16_M3_UPWARD_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C16_M3_UPWARD_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">upward</td>
+    </tr>
+
+    <tr>
+    <td>12</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C17_M2_DOWNWARD_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C17_M2_DOWNWARD_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C17_M2_DOWNWARD_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C17_M2_DOWNWARD_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_C17_M2_DOWNWARD_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">downward</td>
+    </tr>
+
+    <tr>
+    <td>13</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_LH_M6_HOTEL_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_LH_M6_HOTEL_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_LH_M6_HOTEL_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_LH_M6_HOTEL_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_LH_M6_HOTEL_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">hotel</td>
+    </tr>
+
+    <tr>
+    <td>14</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_LY_M2_YANKEE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_LY_M2_YANKEE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_LY_M2_YANKEE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_LY_M2_YANKEE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_LY_M2_YANKEE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">yankee</td>
+    </tr>
+
+    <tr>
+    <td>15</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW13_M8_UNUSUAL_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW13_M8_UNUSUAL_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW13_M8_UNUSUAL_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW13_M8_UNUSUAL_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M05/M05_B2_UW13_M8_UNUSUAL_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">unusual</td>
+    </tr>
+
+    </table>
+
+    <h3>F04 (dysarthria-moderate):</h3>
+    <table border="1">
+    <tr>
+    <th>No.</th>
+    <th>Original</th>
+    <th>E2E-VC</th>
+    <th>SV-VC</th>
+    <th>SA-VC</th>
+    <th>ASA-VC</th>
+    <th>Text</th>
+    </tr>
+
+    <tr>
+    <td>1</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW16_M4_ABLUTIONS_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW16_M4_ABLUTIONS_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW16_M4_ABLUTIONS_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW16_M4_ABLUTIONS_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW16_M4_ABLUTIONS_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">ablutions</td>
+    </tr>
+
+    <tr>
+    <td>2</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW35_M3_ATROCIOUS_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW35_M3_ATROCIOUS_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW35_M3_ATROCIOUS_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW35_M3_ATROCIOUS_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW35_M3_ATROCIOUS_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">atrocious</td>
+    </tr>
+
+    <tr>
+    <td>3</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW85_M6_WATCHES_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW85_M6_WATCHES_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW85_M6_WATCHES_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW85_M6_WATCHES_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW85_M6_WATCHES_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">watches</td>
+    </tr>
+
+    <tr>
+    <td>4</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW89_M7_RABBIT_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW89_M7_RABBIT_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW89_M7_RABBIT_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW89_M7_RABBIT_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW89_M7_RABBIT_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">rabbit</td>
+    </tr>
+
+    <tr>
+    <td>5</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW93_M6_CHAIR_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW93_M6_CHAIR_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW93_M6_CHAIR_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW93_M6_CHAIR_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW93_M6_CHAIR_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">chair</td>
+    </tr>
+
+    <tr>
+    <td>6</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW94_M8_FEATHER_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW94_M8_FEATHER_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW94_M8_FEATHER_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW94_M8_FEATHER_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW94_M8_FEATHER_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">feather</td>
+    </tr>
+
+    <tr>
+    <td>7</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C2_M5_BACKSPACE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C2_M5_BACKSPACE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C2_M5_BACKSPACE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C2_M5_BACKSPACE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C2_M5_BACKSPACE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">backspace</td>
+    </tr>
+
+    <tr>
+    <td>8</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C6_M6_ESCAPE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C6_M6_ESCAPE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C6_M6_ESCAPE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C6_M6_ESCAPE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C6_M6_ESCAPE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">escape</td>
+    </tr>
+
+    <tr>
+    <td>9</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C11_M7_PARAGRAPH_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C11_M7_PARAGRAPH_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C11_M7_PARAGRAPH_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C11_M7_PARAGRAPH_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C11_M7_PARAGRAPH_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">paragraph</td>
+    </tr>
+
+    <tr>
+    <td>10</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C12_M5_SENTENCE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C12_M5_SENTENCE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C12_M5_SENTENCE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C12_M5_SENTENCE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C12_M5_SENTENCE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">sentence</td>
+    </tr>
+
+    <tr>
+    <td>11</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C16_M2_UPWARD_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C16_M2_UPWARD_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C16_M2_UPWARD_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C16_M2_UPWARD_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C16_M2_UPWARD_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">upward</td>
+    </tr>
+
+    <tr>
+    <td>12</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C17_M6_DOWNWARD_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C17_M6_DOWNWARD_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C17_M6_DOWNWARD_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C17_M6_DOWNWARD_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_C17_M6_DOWNWARD_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">downward</td>
+    </tr>
+
+    <tr>
+    <td>13</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_LH_M4_HOTEL_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_LH_M4_HOTEL_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_LH_M4_HOTEL_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_LH_M4_HOTEL_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_LH_M4_HOTEL_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">hotel</td>
+    </tr>
+
+    <tr>
+    <td>14</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_LY_M2_YANKEE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_LY_M2_YANKEE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_LY_M2_YANKEE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_LY_M2_YANKEE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_LY_M2_YANKEE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">yankee</td>
+    </tr>
+
+    <tr>
+    <td>15</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW13_M4_UNUSUAL_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW13_M4_UNUSUAL_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW13_M4_UNUSUAL_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW13_M4_UNUSUAL_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F04/F04_B2_UW13_M4_UNUSUAL_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">unusual</td>
+    </tr>
+
+    </table>
+
+    <h3>M07 (dysarthria-severe):</h3>
+    <table border="1">
+    <tr>
+    <th>No.</th>
+    <th>Original</th>
+    <th>E2E-VC</th>
+    <th>SV-VC</th>
+    <th>SA-VC</th>
+    <th>ASA-VC</th>
+    <th>Text</th>
+    </tr>
+
+    <tr>
+    <td>1</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW16_M4_ABLUTIONS_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW16_M4_ABLUTIONS_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW16_M4_ABLUTIONS_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW16_M4_ABLUTIONS_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW16_M4_ABLUTIONS_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">ablutions</td>
+    </tr>
+
+    <tr>
+    <td>2</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW35_M8_ATROCIOUS_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW35_M8_ATROCIOUS_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW35_M8_ATROCIOUS_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW35_M8_ATROCIOUS_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW35_M8_ATROCIOUS_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">atrocious</td>
+    </tr>
+
+    <tr>
+    <td>3</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW85_M6_WATCHES_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW85_M6_WATCHES_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW85_M6_WATCHES_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW85_M6_WATCHES_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW85_M6_WATCHES_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">watches</td>
+    </tr>
+
+    <tr>
+    <td>4</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW89_M3_RABBIT_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW89_M3_RABBIT_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW89_M3_RABBIT_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW89_M3_RABBIT_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW89_M3_RABBIT_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">rabbit</td>
+    </tr>
+
+    <tr>
+    <td>5</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW93_M6_CHAIR_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW93_M6_CHAIR_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW93_M6_CHAIR_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW93_M6_CHAIR_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW93_M6_CHAIR_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">chair</td>
+    </tr>
+
+    <tr>
+    <td>6</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW94_M2_FEATHER_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW94_M2_FEATHER_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW94_M2_FEATHER_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW94_M2_FEATHER_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW94_M2_FEATHER_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">feather</td>
+    </tr>
+
+    <tr>
+    <td>7</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C2_M5_BACKSPACE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C2_M5_BACKSPACE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C2_M5_BACKSPACE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C2_M5_BACKSPACE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C2_M5_BACKSPACE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">backspace</td>
+    </tr>
+
+    <tr>
+    <td>8</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C6_M6_ESCAPE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C6_M6_ESCAPE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C6_M6_ESCAPE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C6_M6_ESCAPE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C6_M6_ESCAPE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">escape</td>
+    </tr>
+
+    <tr>
+    <td>9</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C11_M7_PARAGRAPH_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C11_M7_PARAGRAPH_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C11_M7_PARAGRAPH_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C11_M7_PARAGRAPH_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C11_M7_PARAGRAPH_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">paragraph</td>
+    </tr>
+
+    <tr>
+    <td>10</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C12_M5_SENTENCE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C12_M5_SENTENCE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C12_M5_SENTENCE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C12_M5_SENTENCE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C12_M5_SENTENCE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">sentence</td>
+    </tr>
+
+    <tr>
+    <td>11</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C16_M3_UPWARD_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C16_M3_UPWARD_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C16_M3_UPWARD_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C16_M3_UPWARD_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C16_M3_UPWARD_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">upward</td>
+    </tr>
+
+    <tr>
+    <td>12</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C17_M2_DOWNWARD_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C17_M2_DOWNWARD_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C17_M2_DOWNWARD_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C17_M2_DOWNWARD_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_C17_M2_DOWNWARD_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">downward</td>
+    </tr>
+
+    <tr>
+    <td>13</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_LH_M6_HOTEL_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_LH_M6_HOTEL_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_LH_M6_HOTEL_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_LH_M6_HOTEL_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_LH_M6_HOTEL_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">hotel</td>
+    </tr>
+
+    <tr>
+    <td>14</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_LY_M2_YANKEE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_LY_M2_YANKEE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_LY_M2_YANKEE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_LY_M2_YANKEE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_LY_M2_YANKEE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">yankee</td>
+    </tr>
+
+    <tr>
+    <td>15</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW13_M8_UNUSUAL_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW13_M8_UNUSUAL_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW13_M8_UNUSUAL_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW13_M8_UNUSUAL_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/M07/M07_B2_UW13_M8_UNUSUAL_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">unusual</td>
+    </tr>
+
+    </table>
+
+    <h3>F02 (dysarthria-severe):</h3>
+    <table border="1">
+    <tr>
+    <th>No.</th>
+    <th>Original</th>
+    <th>E2E-VC</th>
+    <th>SV-VC</th>
+    <th>SA-VC</th>
+    <th>ASA-VC</th>
+    <th>Text</th>
+    </tr>
+
+    <tr>
+    <td>1</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW16_M4_ABLUTIONS_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW16_M4_ABLUTIONS_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW16_M4_ABLUTIONS_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW16_M4_ABLUTIONS_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW16_M4_ABLUTIONS_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">ablutions</td>
+    </tr>
+
+    <tr>
+    <td>2</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW35_M8_ATROCIOUS_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW35_M8_ATROCIOUS_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW35_M8_ATROCIOUS_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW35_M8_ATROCIOUS_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW35_M8_ATROCIOUS_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">atrocious</td>
+    </tr>
+
+    <tr>
+    <td>3</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW85_M6_WATCHES_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW85_M6_WATCHES_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW85_M6_WATCHES_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW85_M6_WATCHES_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW85_M6_WATCHES_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">watches</td>
+    </tr>
+
+    <tr>
+    <td>4</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW89_M4_RABBIT_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW89_M4_RABBIT_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW89_M4_RABBIT_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW89_M4_RABBIT_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW89_M4_RABBIT_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">rabbit</td>
+    </tr>
+
+    <tr>
+    <td>5</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW93_M6_CHAIR_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW93_M6_CHAIR_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW93_M6_CHAIR_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW93_M6_CHAIR_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW93_M6_CHAIR_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">chair</td>
+    </tr>
+
+    <tr>
+    <td>6</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW94_M4_FEATHER_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW94_M4_FEATHER_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW94_M4_FEATHER_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW94_M4_FEATHER_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW94_M4_FEATHER_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">feather</td>
+    </tr>
+
+    <tr>
+    <td>7</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C2_M5_BACKSPACE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C2_M5_BACKSPACE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C2_M5_BACKSPACE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C2_M5_BACKSPACE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C2_M5_BACKSPACE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">backspace</td>
+    </tr>
+
+    <tr>
+    <td>8</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C6_M6_ESCAPE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C6_M6_ESCAPE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C6_M6_ESCAPE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C6_M6_ESCAPE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C6_M6_ESCAPE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">escape</td>
+    </tr>
+
+    <tr>
+    <td>9</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C11_M6_PARAGRAPH_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C11_M6_PARAGRAPH_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C11_M6_PARAGRAPH_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C11_M6_PARAGRAPH_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C11_M6_PARAGRAPH_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">paragraph</td>
+    </tr>
+
+    <tr>
+    <td>10</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C12_M8_SENTENCE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C12_M8_SENTENCE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C12_M8_SENTENCE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C12_M8_SENTENCE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C12_M8_SENTENCE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">sentence</td>
+    </tr>
+
+    <tr>
+    <td>11</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C16_M2_UPWARD_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C16_M2_UPWARD_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C16_M2_UPWARD_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C16_M2_UPWARD_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C16_M2_UPWARD_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">upward</td>
+    </tr>
+
+    <tr>
+    <td>12</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C17_M2_DOWNWARD_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C17_M2_DOWNWARD_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C17_M2_DOWNWARD_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C17_M2_DOWNWARD_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_C17_M2_DOWNWARD_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">downward</td>
+    </tr>
+
+    <tr>
+    <td>13</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_LH_M4_HOTEL_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_LH_M4_HOTEL_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_LH_M4_HOTEL_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_LH_M4_HOTEL_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_LH_M4_HOTEL_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">hotel</td>
+    </tr>
+
+    <tr>
+    <td>14</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_LY_M3_YANKEE_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_LY_M3_YANKEE_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_LY_M3_YANKEE_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_LY_M3_YANKEE_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_LY_M3_YANKEE_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">yankee</td>
+    </tr>
+
+    <tr>
+    <td>15</td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW13_M4_UNUSUAL_original.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW13_M4_UNUSUAL_e2e-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW13_M4_UNUSUAL_sv-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW13_M4_UNUSUAL_sa-vc.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/comparison/F02/F02_B2_UW13_M4_UNUSUAL_asa-vc-new.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">unusual</td>
+    </tr>
+
+    </table>
+
+
+<hr style="height:3px;border:none;border-top:5px solid #555555;" />
+
+    <a name="ablation">
+    <h2>2. Impact of phoneme duration and F0</h2>
+    </a>
+    <li>Speech generation by the proposed ASA-VC with different combinations of phoneme durations and F0:</li>
+    <ul>
+      <li><strong>GD+GF</strong>: Ground-truth Duration + Ground-truth F0</li>
+      <li><strong>GD+PF</strong>: Ground-truth Duration + Predicted F0</li>
+      <li><strong>PD+PF</strong>: Predicted Duration + Predicted F0</li>
+    </ul>
+
+    <h3>M05 (dysarthria-moderate):</h3>
+    <table border="1">
+    <tr>
+    <th>No.</th>
+    <th>GD+GF</th>
+    <th>GD+PF</th>
+    <th>PD+PF</th>
+    <th>Text</th>
+    </tr>
+
+    <tr>
+    <td>1</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW16_ABLUTIONS_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW16_ABLUTIONS_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW16_ABLUTIONS_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">ablutions</td>
+    </tr>
+
+    <tr>
+    <td>2</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW35_ATROCIOUS_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW35_ATROCIOUS_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW35_ATROCIOUS_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">atrocious</td>
+    </tr>
+
+    <tr>
+    <td>3</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW85_WATCHES_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW85_WATCHES_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW85_WATCHES_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">watches</td>
+    </tr>
+
+    <tr>
+    <td>4</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW89_RABBIT_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW89_RABBIT_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW89_RABBIT_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">rabbit</td>
+    </tr>
+
+    <tr>
+    <td>5</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW93_CHAIR_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW93_CHAIR_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW93_CHAIR_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">chair</td>
+    </tr>
+
+    <tr>
+    <td>6</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW94_FEATHER_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW94_FEATHER_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW94_FEATHER_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">feather</td>
+    </tr>
+
+    <tr>
+    <td>7</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C2_BACKSPACE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C2_BACKSPACE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C2_BACKSPACE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">backspace</td>
+    </tr>
+
+    <tr>
+    <td>8</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C6_ESCAPE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C6_ESCAPE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C6_ESCAPE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">escape</td>
+    </tr>
+
+    <tr>
+    <td>9</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C11_PARAGRAPH_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C11_PARAGRAPH_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C11_PARAGRAPH_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">paragraph</td>
+    </tr>
+
+    <tr>
+    <td>10</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C12_SENTENCE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C12_SENTENCE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C12_SENTENCE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">sentence</td>
+    </tr>
+
+    <tr>
+    <td>11</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C16_UPWARD_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C16_UPWARD_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C16_UPWARD_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">upward</td>
+    </tr>
+
+    <tr>
+    <td>12</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C17_DOWNWARD_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C17_DOWNWARD_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_C17_DOWNWARD_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">downward</td>
+    </tr>
+
+    <tr>
+    <td>13</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_LH_HOTEL_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_LH_HOTEL_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_LH_HOTEL_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">hotel</td>
+    </tr>
+
+    <tr>
+    <td>14</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_LY_YANKEE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_LY_YANKEE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_LY_YANKEE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">yankee</td>
+    </tr>
+
+    <tr>
+    <td>15</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW13_UNUSUAL_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW13_UNUSUAL_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M05/M05_B2_UW13_UNUSUAL_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">unusual</td>
+    </tr>
+
+    </table>
+
+    <h3>F04 (dysarthria-moderate):</h3>
+    <table border="1">
+    <tr>
+    <th>No.</th>
+    <th>GD+GF</th>
+    <th>GD+PF</th>
+    <th>PD+PF</th>
+    <th>Text</th>
+    </tr>
+
+    <tr>
+    <td>1</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW16_ABLUTIONS_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW16_ABLUTIONS_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW16_ABLUTIONS_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">ablutions</td>
+    </tr>
+
+    <tr>
+    <td>2</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW35_ATROCIOUS_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW35_ATROCIOUS_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW35_ATROCIOUS_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">atrocious</td>
+    </tr>
+
+    <tr>
+    <td>3</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW85_WATCHES_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW85_WATCHES_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW85_WATCHES_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">watches</td>
+    </tr>
+
+    <tr>
+    <td>4</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW89_RABBIT_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW89_RABBIT_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW89_RABBIT_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">rabbit</td>
+    </tr>
+
+    <tr>
+    <td>5</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW93_CHAIR_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW93_CHAIR_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW93_CHAIR_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">chair</td>
+    </tr>
+
+    <tr>
+    <td>6</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW94_FEATHER_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW94_FEATHER_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW94_FEATHER_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">feather</td>
+    </tr>
+
+    <tr>
+    <td>7</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C2_BACKSPACE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C2_BACKSPACE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C2_BACKSPACE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">backspace</td>
+    </tr>
+
+    <tr>
+    <td>8</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C6_ESCAPE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C6_ESCAPE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C6_ESCAPE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">escape</td>
+    </tr>
+
+    <tr>
+    <td>9</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C11_PARAGRAPH_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C11_PARAGRAPH_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C11_PARAGRAPH_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">paragraph</td>
+    </tr>
+
+    <tr>
+    <td>10</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C12_SENTENCE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C12_SENTENCE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C12_SENTENCE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">sentence</td>
+    </tr>
+
+    <tr>
+    <td>11</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C16_UPWARD_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C16_UPWARD_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C16_UPWARD_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">upward</td>
+    </tr>
+
+    <tr>
+    <td>12</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C17_DOWNWARD_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C17_DOWNWARD_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_C17_DOWNWARD_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">downward</td>
+    </tr>
+
+    <tr>
+    <td>13</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_LH_HOTEL_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_LH_HOTEL_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_LH_HOTEL_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">hotel</td>
+    </tr>
+
+    <tr>
+    <td>14</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_LY_YANKEE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_LY_YANKEE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_LY_YANKEE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">yankee</td>
+    </tr>
+
+    <tr>
+    <td>15</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW13_UNUSUAL_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW13_UNUSUAL_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F04/F04_B2_UW13_UNUSUAL_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">unusual</td>
+    </tr>
+
+    </table>
+
+    <h3>M07 (dysarthria-severe):</h3>
+    <table border="1">
+    <tr>
+    <th>No.</th>
+    <th>GD+GF</th>
+    <th>GD+PF</th>
+    <th>PD+PF</th>
+    <th>Text</th>
+    </tr>
+
+    <tr>
+    <td>1</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW16_ABLUTIONS_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW16_ABLUTIONS_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW16_ABLUTIONS_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">ablutions</td>
+    </tr>
+
+    <tr>
+    <td>2</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW35_ATROCIOUS_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW35_ATROCIOUS_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW35_ATROCIOUS_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">atrocious</td>
+    </tr>
+
+    <tr>
+    <td>3</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW85_WATCHES_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW85_WATCHES_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW85_WATCHES_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">watches</td>
+    </tr>
+
+    <tr>
+    <td>4</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW89_RABBIT_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW89_RABBIT_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW89_RABBIT_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">rabbit</td>
+    </tr>
+
+    <tr>
+    <td>5</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW93_CHAIR_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW93_CHAIR_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW93_CHAIR_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">chair</td>
+    </tr>
+
+    <tr>
+    <td>6</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW94_FEATHER_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW94_FEATHER_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW94_FEATHER_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">feather</td>
+    </tr>
+
+    <tr>
+    <td>7</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C2_BACKSPACE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C2_BACKSPACE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C2_BACKSPACE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">backspace</td>
+    </tr>
+
+    <tr>
+    <td>8</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C6_ESCAPE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C6_ESCAPE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C6_ESCAPE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">escape</td>
+    </tr>
+
+    <tr>
+    <td>9</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C11_PARAGRAPH_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C11_PARAGRAPH_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C11_PARAGRAPH_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">paragraph</td>
+    </tr>
+
+    <tr>
+    <td>10</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C12_SENTENCE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C12_SENTENCE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C12_SENTENCE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">sentence</td>
+    </tr>
+
+    <tr>
+    <td>11</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C16_UPWARD_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C16_UPWARD_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C16_UPWARD_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">upward</td>
+    </tr>
+
+    <tr>
+    <td>12</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C17_DOWNWARD_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C17_DOWNWARD_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_C17_DOWNWARD_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">downward</td>
+    </tr>
+
+    <tr>
+    <td>13</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_LH_HOTEL_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_LH_HOTEL_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_LH_HOTEL_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">hotel</td>
+    </tr>
+
+    <tr>
+    <td>14</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_LY_YANKEE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_LY_YANKEE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_LY_YANKEE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">yankee</td>
+    </tr>
+
+    <tr>
+    <td>15</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW13_UNUSUAL_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW13_UNUSUAL_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/M07/M07_B2_UW13_UNUSUAL_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">unusual</td>
+    </tr>
+
+    </table>
+
+    <h3>F02 (dysarthria-severe):</h3>
+    <table border="1">
+    <tr>
+    <th>No.</th>
+    <th>GD+GF</th>
+    <th>GD+PF</th>
+    <th>PD+PF</th>
+    <th>Text</th>
+    </tr>
+
+    <tr>
+    <td>1</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW16_ABLUTIONS_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW16_ABLUTIONS_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW16_ABLUTIONS_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">ablutions</td>
+    </tr>
+
+    <tr>
+    <td>2</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW35_ATROCIOUS_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW35_ATROCIOUS_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW35_ATROCIOUS_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">atrocious</td>
+    </tr>
+
+    <tr>
+    <td>3</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW85_WATCHES_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW85_WATCHES_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW85_WATCHES_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">watches</td>
+    </tr>
+
+    <tr>
+    <td>4</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW89_RABBIT_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW89_RABBIT_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW89_RABBIT_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">rabbit</td>
+    </tr>
+
+    <tr>
+    <td>5</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW93_CHAIR_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW93_CHAIR_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW93_CHAIR_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">chair</td>
+    </tr>
+
+    <tr>
+    <td>6</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW94_FEATHER_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW94_FEATHER_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW94_FEATHER_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">feather</td>
+    </tr>
+
+    <tr>
+    <td>7</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C2_BACKSPACE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C2_BACKSPACE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C2_BACKSPACE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">backspace</td>
+    </tr>
+
+    <tr>
+    <td>8</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C6_ESCAPE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C6_ESCAPE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C6_ESCAPE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">escape</td>
+    </tr>
+
+    <tr>
+    <td>9</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C11_PARAGRAPH_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C11_PARAGRAPH_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C11_PARAGRAPH_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">paragraph</td>
+    </tr>
+
+    <tr>
+    <td>10</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C12_SENTENCE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C12_SENTENCE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C12_SENTENCE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">sentence</td>
+    </tr>
+
+    <tr>
+    <td>11</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C16_UPWARD_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C16_UPWARD_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C16_UPWARD_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">upward</td>
+    </tr>
+
+    <tr>
+    <td>12</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C17_DOWNWARD_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C17_DOWNWARD_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_C17_DOWNWARD_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">downward</td>
+    </tr>
+
+    <tr>
+    <td>13</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_LH_HOTEL_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_LH_HOTEL_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_LH_HOTEL_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">hotel</td>
+    </tr>
+
+    <tr>
+    <td>14</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_LY_YANKEE_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_LY_YANKEE_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_LY_YANKEE_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">yankee</td>
+    </tr>
+
+    <tr>
+    <td>15</td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW13_UNUSUAL_m0.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW13_UNUSUAL_m1.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td>
+    <audio controls>
+    <source src="./audios/ablation/F02/F02_B2_UW13_UNUSUAL_m2.wav" type="audio/wav">
+    </audio>
+    </td>
+    <td align="center">unusual</td>
+    </tr>
+
+    </table>
+
+
+</body>
+</html>
+
