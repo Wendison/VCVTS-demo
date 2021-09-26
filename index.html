@@ -19,7 +19,7 @@ audio {
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Demo for multi-speaker Lip-to-Speech</title>
+<title>Demo of VCVTS: Multi-speaker Video-to-Speech Synthesis</title>
 
 <style>
 body {
@@ -29,24 +29,21 @@ audio {
   width: 200px;
   margin-right: 10px;
 }
-video {
-  width: 200px;
-  height: 200px;
-}
+
 </style>
 
 
 <!-- Meta tags for search engines to crawl -->
 <meta name="robots" content="index,follow">
 <meta name="description" content="Here shows my abstract">
-<meta name="keywords" content="Multi-speaker; Lip-to-Speech synthesis; voice conversion; knowledge transfer; vector quantization; contrastive predictive coding; speech generation;">
-<link rel="author" href="https://wendison.github.io/KTVC-MSLTS-demo/">
+<meta name="keywords" content="Multi-speaker; Video-to-Speech synthesis; voice conversion; knowledge transfer; vector quantization; contrastive predictive coding; speech generation;">
+<link rel="author" href="https://wendison.github.io/KTVC-MSVTS-demo/">
 
 <!-- Fonts and stuff -->
-<link href="./LTS/css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" type="text/css" href="./LTS/project.css" media="screen">
-<link rel="stylesheet" type="text/css" media="screen" href="./LTS/iconize.css">
-<script async="" src="./LTS/prettify.js"></script>
+<link href="./VTS/css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="./VTS/project.css" media="screen">
+<link rel="stylesheet" type="text/css" media="screen" href="./VTS/iconize.css">
+<script async="" src="./VTS/prettify.js"></script>
 
 </head>
 
@@ -55,7 +52,7 @@ video {
     <div id="content-inner">
       <div class="section head">
 
-      <h1>Multi-speaker Lip-to-Speech synthesis</h1>
+      <h1>VCVTS: Multi-speaker Video-to-Speech Synthesis via Cross-modal Knowledge Transfer from Voice Conversion</h1>
 
       <div class="authors">
         <a href="https://wendison.github.io/">Disong Wang<sup>1</sup></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -63,19 +60,19 @@ video {
         <a href="https://scholar.google.com/citations?user=yE6WZy4AAAAJ&hl=zh-CN/">Dan Su<sup>2</sup></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         
         <a href="https://www1.se.cuhk.edu.hk/~xyliu/">Xunying Liu<sup>1</sup></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-        <a href="https://scholar.google.com/citations?user=tMY31_gAAAAJ&hl=zh-TW/">Dong Yu<sup>2</sup></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+        <a href="https://sites.google.com/view/dongyu888/">Dong Yu<sup>2</sup></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
         <a href="https://www.se.cuhk.edu.hk/people/academic-staff/prof-meng-mei-ling-helen/">Helen Meng<sup>1</sup></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
       </div>
 
       <div class="affiliations">
-          <p> <sup>1</sup>The Chinese University of Hong Kong, <sup>2</sup>Tencent AI lab </p>
+          <p> <sup>1</sup>The Chinese University of Hong Kong, <sup>2</sup>Tencent AI Lab </p>
       </div>
 
 
       <!--<div class="venue">(<a href="https://2022.ieeeicassp.org/" target="_blank">ICASSP 2022</a>) 2020, <font color="#e86e14">Unknown</font> </div>-->
     </div>
 
-      <!--<center><img src="./LTS/diagram.png" border="0" width="90%"></center>-->
+      <!--<center><img src="./VTS/diagram.png" border="0" width="90%"></center>-->
 
 
 
@@ -83,8 +80,9 @@ video {
       <h2>Content</h2>
       <p>
         <ul>
-            <li><strong><a href="#abstract"><font size="4">Abstract</font></a></strong>
-            <li><strong><a href="#grid-seen-state"><font size="4">LTS on GRID</font></a></strong>
+            <li><strong><a href="#review"><font size="4">Quick review</font></a></strong>
+            <!--<li><strong><a href="#abstract"><font size="4">Abstract</font></a></strong>-->
+            <li><strong><a href="#grid-seen-state"><font size="4">Video-to-Speech on GRID</font></a></strong>
                 <ul>
                     <li><strong><a href="#grid-seen-state"><font size="4">Seen speakers</font></a></strong>
                         <ul>
@@ -104,13 +102,26 @@ video {
                     </li>
                 </ul>
             </li>
-            <li><strong><a href="#lrw-state"><font size="4">LTS on LRW</font></a></strong></li>
+            <li><strong><a href="#lrw-state"><font size="4">Video-to-Speech on LRW</font></a></strong></li>
             <li><strong><a href="#speaker-id-control"><font size="4">Speaker identity control</font></a></strong></li>
         </ul>
       </p>
     </div>
 
     <hr style="height:3px;border:none;border-top:5px solid #555555;" />
+    <div class="section review">
+      <a name="review">
+      <h2>Quick review</h2>
+      </a>
+      <!--<br>-->
+      <p>
+        <video width=1024 height=576 controls>
+            <source src="./videos/demo-720p.webm" type="video/mp4">
+        </video>
+      </p>
+    </div>
+
+    <!--<hr style="height:3px;border:none;border-top:5px solid #555555;" />
     <div class="section abstract">
       <a name="abstract">
       <h2>Abstract</h2>
@@ -119,7 +130,7 @@ video {
       <p>
         Here shows the abstract - TODO.
       </p>
-    </div>
+    </div>-->
 
 
     <!--<h2>Audio samples: Dysarthric speech reconstruction</h2>
@@ -136,11 +147,11 @@ video {
   <hr style="height:3px;border:none;border-top:5px solid #555555;" />
     <div class="section state">
       <a name="grid-seen-state">
-      <h2>LTS on GRID - Seen speakers (s1, s2, s4 and s29), where partial data of s1, s2, s4 and s29 has been used for training</h2>
+      <h2>Video-to-Speech on GRID - Seen speakers (s1, s2, s4 and s29), where partial data of s1, s2, s4 and s29 has been used for training</h2>
       </a>
-      <!--<p>
-        <strong>**This section shows the synthesis results for speakers (s1, s2, s4 and s29) that are seen during training, where partial data of s1, s2, s4 and s29 has been used for training.</strong>
-      </p>-->
+      <p>
+        <strong><font color="#FF0000" size="4">Note: GL denotes Griffin-Lim, PWG denotes Parallel WaveGAN vocoder.</font></strong>
+      </p>
     </div>
 
     <div class="section video demo for GRID-seen">
@@ -155,40 +166,40 @@ video {
                 <th align="center">Ground-truth</th>
                 <th align="center">XTS</th>
                 <th align="center">Lip2Wav</th>
-                <th align="center">Proposed (GL)</th>
-                <th align="center">Proposed (PWG)</th>
+                <th align="center">VCVTS + GL (ours)</th>
+                <th align="center">VCVTS + PWG (ours)</th>
                 <th align="center">Text</th>
             </tr>
 
             <tr>
                 <td align="center">1</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_bbas3a_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_bbas3a_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_bbas3a_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_bbas3a_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_bbas3a_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_bbas3a_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -199,32 +210,32 @@ video {
             <tr>
                 <td align="center">2</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_pgwl1s_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_pgwl1s_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_pgwl1s_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_pgwl1s_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_pgwl1s_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_pgwl1s_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -235,32 +246,32 @@ video {
             <tr>
                 <td align="center">3</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_swwi8n_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_swwi8n_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_swwi8n_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_swwi8n_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_swwi8n_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s1_swwi8n_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -282,40 +293,40 @@ video {
                 <th align="center">Ground-truth</th>
                 <th align="center">XTS</th>
                 <th align="center">Lip2Wav</th>
-                <th align="center">Proposed (GL)</th>
-                <th align="center">Proposed (PWG)</th>
+                <th align="center">VCVTS + GL (ours)</th>
+                <th align="center">VCVTS + PWG (ours)</th>
                 <th align="center">Text</th>
             </tr>
 
             <tr>
                 <td align="center">1</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_bbir6a_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_bbir6a_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_bbir6a_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_bbir6a_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_bbir6a_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_bbir6a_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -326,32 +337,32 @@ video {
             <tr>
                 <td align="center">2</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_pgad6s_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_pgad6s_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_pgad6s_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_pgad6s_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_pgad6s_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_pgad6s_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -362,32 +373,32 @@ video {
             <tr>
                 <td align="center">3</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_swbb9p_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_swbb9p_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_swbb9p_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_swbb9p_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_swbb9p_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s4_swbb9p_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -409,40 +420,40 @@ video {
                 <th align="center">Ground-truth</th>
                 <th align="center">XTS</th>
                 <th align="center">Lip2Wav</th>
-                <th align="center">Proposed (GL)</th>
-                <th align="center">Proposed (PWG)</th>
+                <th align="center">VCVTS + GL (ours)</th>
+                <th align="center">VCVTS + PWG (ours)</th>
                 <th align="center">Text</th>
             </tr>
 
             <tr>
                 <td align="center">1</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_bbil4a_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_bbil4a_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_bbil4a_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_bbil4a_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_bbil4a_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_bbil4a_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -453,32 +464,32 @@ video {
             <tr>
                 <td align="center">2</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_lgwaza_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_lgwaza_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_lgwaza_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_lgwaza_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_lgwaza_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_lgwaza_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -489,32 +500,32 @@ video {
             <tr>
                 <td align="center">3</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_pwaj5n_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_pwaj5n_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_pwaj5n_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_pwaj5n_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_pwaj5n_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s2_pwaj5n_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -536,40 +547,40 @@ video {
                 <th align="center">Ground-truth</th>
                 <th align="center">XTS</th>
                 <th align="center">Lip2Wav</th>
-                <th align="center">Proposed (GL)</th>
-                <th align="center">Proposed (PWG)</th>
+                <th align="center">VCVTS + GL (ours)</th>
+                <th align="center">VCVTS + PWG (ours)</th>
                 <th align="center">Text</th>
             </tr>
 
             <tr>
                 <td align="center">1</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_bgak6n_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_bgak6n_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_bgak6n_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_bgak6n_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_bgak6n_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_bgak6n_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -580,32 +591,32 @@ video {
             <tr>
                 <td align="center">2</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_lrbv1s_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_lrbv1s_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_lrbv1s_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_lrbv1s_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_lrbv1s_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_lrbv1s_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -616,32 +627,32 @@ video {
             <tr>
                 <td align="center">3</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_pgin7a_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_pgin7a_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_pgin7a_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_pgin7a_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_pgin7a_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-seen/s29_pgin7a_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -658,7 +669,7 @@ video {
     <hr style="height:3px;border:none;border-top:5px dotted #555555;" />
     <div class="section state">
       <a name="grid-unseen-state">
-      <h2>LTS on GRID - Unseen speakers (s1, s2, s4 and s29), where data of s1, s2, s4 and s29 was not used for training</h2>
+      <h2>Video-to-Speech on GRID - Unseen speakers (s1, s2, s4 and s29), where data of s1, s2, s4 and s29 was not used for training</h2>
       </a>
       <!--<p>
         <strong>**This section shows the synthesis results for speakers (s1, s2, s4 and s29) that are seen during training, where partial data of s1, s2, s4 and s29 has been used for training.</strong>
@@ -677,40 +688,40 @@ video {
                 <th align="center">Ground-truth</th>
                 <th align="center">XTS</th>
                 <th align="center">Lip2Wav</th>
-                <th align="center">Proposed (GL)</th>
-                <th align="center">Proposed (PWG)</th>
+                <th align="center">VCVTS + GL (ours)</th>
+                <th align="center">VCVTS + PWG (ours)</th>
                 <th align="center">Text</th>
             </tr>
 
             <tr>
                 <td align="center">1</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_bbas3a_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_bbas3a_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_bbas3a_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_bbas3a_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_bbas3a_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_bbas3a_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -721,32 +732,32 @@ video {
             <tr>
                 <td align="center">2</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_pgwl1s_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_pgwl1s_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_pgwl1s_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_pgwl1s_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_pgwl1s_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_pgwl1s_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -757,32 +768,32 @@ video {
             <tr>
                 <td align="center">3</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_swwi8n_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_swwi8n_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_swwi8n_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_swwi8n_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_swwi8n_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s1_swwi8n_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -804,40 +815,40 @@ video {
                 <th align="center">Ground-truth</th>
                 <th align="center">XTS</th>
                 <th align="center">Lip2Wav</th>
-                <th align="center">Proposed (GL)</th>
-                <th align="center">Proposed (PWG)</th>
+                <th align="center">VCVTS + GL (ours)</th>
+                <th align="center">VCVTS + PWG (ours)</th>
                 <th align="center">Text</th>
             </tr>
 
             <tr>
                 <td align="center">1</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_bbir6a_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_bbir6a_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_bbir6a_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_bbir6a_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_bbir6a_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_bbir6a_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -848,32 +859,32 @@ video {
             <tr>
                 <td align="center">2</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_pgad6s_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_pgad6s_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_pgad6s_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_pgad6s_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_pgad6s_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_pgad6s_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -884,32 +895,32 @@ video {
             <tr>
                 <td align="center">3</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_swbb9p_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_swbb9p_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_swbb9p_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_swbb9p_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_swbb9p_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s4_swbb9p_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -931,40 +942,40 @@ video {
                 <th align="center">Ground-truth</th>
                 <th align="center">XTS</th>
                 <th align="center">Lip2Wav</th>
-                <th align="center">Proposed (GL)</th>
-                <th align="center">Proposed (PWG)</th>
+                <th align="center">VCVTS + GL (ours)</th>
+                <th align="center">VCVTS + PWG (ours)</th>
                 <th align="center">Text</th>
             </tr>
 
             <tr>
                 <td align="center">1</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_bbil4a_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_bbil4a_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_bbil4a_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_bbil4a_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_bbil4a_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_bbil4a_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -975,32 +986,32 @@ video {
             <tr>
                 <td align="center">2</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_lgwaza_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_lgwaza_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_lgwaza_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_lgwaza_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_lgwaza_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_lgwaza_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1011,32 +1022,32 @@ video {
             <tr>
                 <td align="center">3</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_pwaj5n_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_pwaj5n_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_pwaj5n_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_pwaj5n_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_pwaj5n_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s2_pwaj5n_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1058,40 +1069,40 @@ video {
                 <th align="center">Ground-truth</th>
                 <th align="center">XTS</th>
                 <th align="center">Lip2Wav</th>
-                <th align="center">Proposed (GL)</th>
-                <th align="center">Proposed (PWG)</th>
+                <th align="center">VCVTS + GL (ours)</th>
+                <th align="center">VCVTS + PWG (ours)</th>
                 <th align="center">Text</th>
             </tr>
 
             <tr>
                 <td align="center">1</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_bgak6n_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_bgak6n_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_bgak6n_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_bgak6n_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_bgak6n_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_bgak6n_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1102,32 +1113,32 @@ video {
             <tr>
                 <td align="center">2</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_lrbv1s_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_lrbv1s_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_lrbv1s_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_lrbv1s_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_lrbv1s_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_lrbv1s_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1138,32 +1149,32 @@ video {
             <tr>
                 <td align="center">3</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_pgin7a_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_pgin7a_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_pgin7a_xts.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_pgin7a_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_pgin7a_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/grid-unseen/s29_pgin7a_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1180,7 +1191,7 @@ video {
     <hr style="height:3px;border:none;border-top:5px solid #555555;" />
     <div class="section state">
       <a name="lrw-state">
-      <h2>LTS on LRW - Unseen speakers</h2>
+      <h2>Video-to-Speech on LRW - Unseen speakers</h2>
       </a>
       <p>
         <li><strong>As speaker label is unavailable for each video of LRW, we hypothesize that each video has a unique speaker identity, so testing speakers are treated as unseen speakers.</strong></li>
@@ -1196,35 +1207,35 @@ video {
                 <th align="center">Silent video</th>
                 <th align="center">Ground-truth</th>
                 <th align="center">Lip2Wav</th>
-                <th align="center">Proposed (GL)</th>
-                <th align="center">Proposed (PWG)</th>
+                <th align="center">VCVTS + GL (ours)</th>
+                <th align="center">VCVTS + PWG (ours)</th>
                 <th align="center">Text</th>
             </tr>
 
             <tr>
                 <td align="center">1</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/ACCUSED_00001_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/ACCUSED_00001_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/ACCUSED_00001_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/ACCUSED_00001_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/ACCUSED_00001_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1234,27 +1245,27 @@ video {
             <tr>
                 <td align="center">2</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/BELIEVE_00001_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/BELIEVE_00001_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/BELIEVE_00001_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/BELIEVE_00001_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/BELIEVE_00001_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1264,27 +1275,27 @@ video {
             <tr>
                 <td align="center">3</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/COMPANY_00001_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/COMPANY_00001_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/COMPANY_00001_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/COMPANY_00001_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/COMPANY_00001_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1294,27 +1305,27 @@ video {
             <tr>
                 <td align="center">4</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/EXTRA_00001_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/EXTRA_00001_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/EXTRA_00001_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/EXTRA_00001_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/EXTRA_00001_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1324,27 +1335,27 @@ video {
             <tr>
                 <td align="center">5</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/FURTHER_00001_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/FURTHER_00001_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/FURTHER_00001_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/FURTHER_00001_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/FURTHER_00001_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1354,27 +1365,27 @@ video {
             <tr>
                 <td align="center">6</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/GROWING_00001_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/GROWING_00001_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/GROWING_00001_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/GROWING_00001_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/GROWING_00001_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1384,27 +1395,27 @@ video {
             <tr>
                 <td align="center">7</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/HAPPEN_00001_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/HAPPEN_00001_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/HAPPEN_00001_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/HAPPEN_00001_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/HAPPEN_00001_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1414,27 +1425,27 @@ video {
             <tr>
                 <td align="center">8</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/IMPACT_00001_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/IMPACT_00001_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/IMPACT_00001_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/IMPACT_00001_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/IMPACT_00001_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1444,27 +1455,27 @@ video {
             <tr>
                 <td align="center">9</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/NATIONAL_00001_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/NATIONAL_00001_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/NATIONAL_00001_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/NATIONAL_00001_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/NATIONAL_00001_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1474,27 +1485,27 @@ video {
             <tr>
                 <td align="center">10</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/RETURN_00001_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/RETURN_00001_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/RETURN_00001_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/RETURN_00001_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/RETURN_00001_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1504,27 +1515,27 @@ video {
             <tr>
                 <td align="center">11</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/SCOTTISH_00001_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/SCOTTISH_00001_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/SCOTTISH_00001_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/SCOTTISH_00001_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/SCOTTISH_00001_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1534,27 +1545,27 @@ video {
             <tr>
                 <td align="center">12</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/YESTERDAY_00001_sil.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/YESTERDAY_00001_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/YESTERDAY_00001_lip2wav.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/YESTERDAY_00001_prop_gl.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/lrw/YESTERDAY_00001_prop_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1598,32 +1609,32 @@ video {
             <tr>
                 <td align="center">1</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/AUTHORITIES_00002_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/AUTHORITIES_00002-AUTHORITIES_00002_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/AUTHORITIES_00002-INFORMATION_00002_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/AUTHORITIES_00002-ISLAMIC_00001_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/AUTHORITIES_00002-lrby7p_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/AUTHORITIES_00002-pbivzp_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1632,32 +1643,32 @@ video {
             <tr>
                 <td align="center">2</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/BETTER_00002_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/BETTER_00002-BETTER_00002_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/BETTER_00002-INFORMATION_00002_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/BETTER_00002-ISLAMIC_00001_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/BETTER_00002-lrby7p_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/BETTER_00002-pbivzp_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1666,32 +1677,32 @@ video {
             <tr>
                 <td align="center">3</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/EDUCATION_00002_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/EDUCATION_00002-EDUCATION_00002_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/EDUCATION_00002-INFORMATION_00002_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/EDUCATION_00002-ISLAMIC_00001_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/EDUCATION_00002-lrby7p_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/EDUCATION_00002-pbivzp_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1700,32 +1711,32 @@ video {
             <tr>
                 <td align="center">4</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/FOLLOWING_00002_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/FOLLOWING_00002-FOLLOWING_00002_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/FOLLOWING_00002-INFORMATION_00002_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/FOLLOWING_00002-ISLAMIC_00001_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/FOLLOWING_00002-lrby7p_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw1/FOLLOWING_00002-pbivzp_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1750,32 +1761,32 @@ video {
             <tr>
                 <td align="center">1</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/PRIVATE_00002_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/PRIVATE_00002-PRIVATE_00002_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/PRIVATE_00002-bwwn5n_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/PRIVATE_00002-NEVER_00001_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/PRIVATE_00002-prag2n_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/PRIVATE_00002-SITUATION_00001_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1784,32 +1795,32 @@ video {
             <tr>
                 <td align="center">2</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/STRONG_00002_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/STRONG_00002-STRONG_00002_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/STRONG_00002-bwwn5n_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/STRONG_00002-NEVER_00001_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/STRONG_00002-prag2n_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/STRONG_00002-SITUATION_00001_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1818,32 +1829,32 @@ video {
             <tr>
                 <td align="center">3</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/THIRD_00002_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/THIRD_00002-THIRD_00002_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/THIRD_00002-bwwn5n_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/THIRD_00002-NEVER_00001_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/THIRD_00002-prag2n_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/THIRD_00002-SITUATION_00001_pwg.webm" type="video/webm">
                     </video>
                 </td>
@@ -1852,32 +1863,32 @@ video {
             <tr>
                 <td align="center">4</td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/WESTMINSTER_00002_gt.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/WESTMINSTER_00002-WESTMINSTER_00002_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/WESTMINSTER_00002-bwwn5n_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/WESTMINSTER_00002-NEVER_00001_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/WESTMINSTER_00002-prag2n_pwg.webm" type="video/webm">
                     </video>
                 </td>
                 <td align="center">
-                    <video controls>
+                    <video width=200px height=200px controls>
                         <source src="./videos/speaker-identity-control/lrw2/WESTMINSTER_00002-SITUATION_00001_pwg.webm" type="video/webm">
                     </video>
                 </td>
