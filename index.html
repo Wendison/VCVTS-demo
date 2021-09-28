@@ -40,10 +40,10 @@ audio {
 <link rel="author" href="https://wendison.github.io/KTVC-MSVTS-demo/">
 
 <!-- Fonts and stuff -->
-<link href="./VTS/css" rel="stylesheet" type="text/css">
-<link rel="stylesheet" type="text/css" href="./VTS/project.css" media="screen">
-<link rel="stylesheet" type="text/css" media="screen" href="./VTS/iconize.css">
-<script async="" src="./VTS/prettify.js"></script>
+<link href="./VCVTS/css" rel="stylesheet" type="text/css">
+<link rel="stylesheet" type="text/css" href="./VCVTS/project.css" media="screen">
+<link rel="stylesheet" type="text/css" media="screen" href="./VCVTS/iconize.css">
+<script async="" src="./VCVTS/prettify.js"></script>
 
 </head>
 
@@ -80,7 +80,7 @@ audio {
       <h2>Content</h2>
       <p>
         <ul>
-            <li><strong><a href="#review"><font size="4">Quick review</font></a></strong>
+            <li><strong><a href="#overview"><font size="4">Quick overview</font></a></strong>
             <!--<li><strong><a href="#abstract"><font size="4">Abstract</font></a></strong>-->
             <li><strong><a href="#grid-seen-state"><font size="4">Video-to-Speech on GRID</font></a></strong>
                 <ul>
@@ -109,15 +109,16 @@ audio {
     </div>
 
     <hr style="height:3px;border:none;border-top:5px solid #555555;" />
-    <div class="section review">
-      <a name="review">
-      <h2>Quick review</h2>
+    <div class="section overview">
+      <a name="overview">
+      <h2>Quick overview</h2>
       </a>
       <!--<br>-->
       <p>
-        <video width=1024 height=576 controls>
-            <source src="./videos/demo-720p.webm" type="video/mp4">
-        </video>
+        <!--<video width=1024 height=576 controls>
+            <source src="./videos/demo-480p-v1.mp4" type="video/mp4">
+        </video>-->
+        <iframe width="1024" height="576" src="https://www.youtube.com/embed/9PedoL6l-ls" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </p>
     </div>
 
@@ -1594,6 +1595,165 @@ audio {
 
     <div class="section video demo for sid-control">
       <p>
+        <strong><font color="#FF0000" size="4">Using Griffin-Lim to synthesize waveform:</font></strong>
+        <table border="1">
+            <tr>
+                <th align="center">No.</th>
+                <th align="center">Ground-truth</th>
+                <th align="center">Generate-from-gt-spk</th>
+                <th align="center">Generate-from-{LRW-test-ANNOUNCED_00001}</th>
+                <th align="center">Generate-from-{GRID-s2-bwwn5n}</th>
+                <th align="center">Generate-from-{LRW-test-MEETING_00002}</th>
+                <th align="center">Generate-from-{GRID-s29-prag2n}</th>
+                <th align="center">Text</th>
+            </tr>
+
+            <tr>
+                <td align="center">1</td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/DIFFERENT_00002_gt.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/DIFFERENT_00002-DIFFERENT_00002_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/DIFFERENT_00002-ANNOUNCED_00001_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/DIFFERENT_00002-bwwn5n_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/DIFFERENT_00002-MEETING_00002_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/DIFFERENT_00002-prag2n_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">Different</td>
+            </tr>
+            <tr>
+                <td align="center">2</td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/INCREASE_00002_gt.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/INCREASE_00002-INCREASE_00002_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/INCREASE_00002-ANNOUNCED_00001_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/INCREASE_00002-bwwn5n_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/INCREASE_00002-MEETING_00002_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/INCREASE_00002-prag2n_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">Increase</td>
+            </tr>
+            <tr>
+                <td align="center">3</td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/LABOUR_00002_gt.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/LABOUR_00002-LABOUR_00002_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/LABOUR_00002-ANNOUNCED_00001_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/LABOUR_00002-bwwn5n_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/LABOUR_00002-MEETING_00002_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/LABOUR_00002-prag2n_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">Labour</td>
+            </tr>
+            <tr>
+                <td align="center">4</td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/NOTHING_00002_gt.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/NOTHING_00002-NOTHING_00002_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/NOTHING_00002-ANNOUNCED_00001_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/NOTHING_00002-bwwn5n_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/NOTHING_00002-MEETING_00002_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">
+                    <video width=200px height=200px controls>
+                        <source src="./videos/speaker-identity-control/lrw2/NOTHING_00002-prag2n_gl.webm" type="video/webm">
+                    </video>
+                </td>
+                <td align="center">Nothing</td>
+            </tr>
+
+
+        </table>
+        <br>
+        <br>
+
+
+        <strong><font color="#FF0000" size="4">Using Parallel WaveGAN to synthesize waveform:</font></strong>
+        <br>
+        <br>
         <table border="1">
             <tr>
                 <th align="center">No.</th>
@@ -1742,159 +1902,6 @@ audio {
                 </td>
                 <td align="center">Following</td>
             </tr>
-
-        </table>
-        <br>
-
-        <table border="1">
-            <tr>
-                <th align="center">No.</th>
-                <th align="center">Ground-truth</th>
-                <th align="center">Generate-from-gt-spk</th>
-                <th align="center">Generate-from-{GRID-s2-bwwn5n}</th>
-                <th align="center">Generate-from-{LRW-test-NEVER_00001}</th>
-                <th align="center">Generate-from-{GRID-s29-prag2n}</th>
-                <th align="center">Generate-from-{LRW-test-SITUATION_00001}</th>
-                <th align="center">Text</th>
-            </tr>
-
-            <tr>
-                <td align="center">1</td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/PRIVATE_00002_gt.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/PRIVATE_00002-PRIVATE_00002_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/PRIVATE_00002-bwwn5n_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/PRIVATE_00002-NEVER_00001_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/PRIVATE_00002-prag2n_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/PRIVATE_00002-SITUATION_00001_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">Private</td>
-            </tr>
-            <tr>
-                <td align="center">2</td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/STRONG_00002_gt.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/STRONG_00002-STRONG_00002_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/STRONG_00002-bwwn5n_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/STRONG_00002-NEVER_00001_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/STRONG_00002-prag2n_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/STRONG_00002-SITUATION_00001_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">Strong</td>
-            </tr>
-            <tr>
-                <td align="center">3</td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/THIRD_00002_gt.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/THIRD_00002-THIRD_00002_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/THIRD_00002-bwwn5n_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/THIRD_00002-NEVER_00001_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/THIRD_00002-prag2n_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/THIRD_00002-SITUATION_00001_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">Third</td>
-            </tr>
-            <tr>
-                <td align="center">4</td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/WESTMINSTER_00002_gt.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/WESTMINSTER_00002-WESTMINSTER_00002_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/WESTMINSTER_00002-bwwn5n_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/WESTMINSTER_00002-NEVER_00001_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/WESTMINSTER_00002-prag2n_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">
-                    <video width=200px height=200px controls>
-                        <source src="./videos/speaker-identity-control/lrw2/WESTMINSTER_00002-SITUATION_00001_pwg.webm" type="video/webm">
-                    </video>
-                </td>
-                <td align="center">Westminster</td>
-            </tr>
-
 
         </table>
 
